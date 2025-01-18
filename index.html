@@ -75,7 +75,7 @@
       document.getElementById("outputText").innerText = sentences.join("\n");
     });
 
-    // 長押しでコピー機能
+    // 長押しでコピー機能（iPhone対応）
     document.getElementById("outputText").addEventListener("click", function () {
       const outputText = this.innerText;
       if (outputText.trim() === "" || outputText === "ここに結果が表示されます") {
@@ -83,11 +83,18 @@
         return;
       }
 
-      navigator.clipboard.writeText(outputText).then(() => {
+      // 一時的なテキストエリアを作成してコピー
+      const tempTextArea = document.createElement("textarea");
+      tempTextArea.value = outputText;
+      document.body.appendChild(tempTextArea);
+      tempTextArea.select();
+      try {
+        document.execCommand("copy");
         alert("結果をコピーしました！");
-      }).catch(err => {
+      } catch (err) {
         alert("コピーに失敗しました：" + err);
-      });
+      }
+      document.body.removeChild(tempTextArea); // 一時テキストエリアを削除
     });
   </script>
 </body>
