@@ -46,6 +46,7 @@
       white-space: pre-wrap;
       font-size: 16px;
       min-height: 100px;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -58,6 +59,7 @@
   <div id="outputText">ここに結果が表示されます</div>
 
   <script>
+    // テキスト変換機能
     document.getElementById("convertButton").addEventListener("click", function () {
       const inputText = document.getElementById("inputText").value;
       if (!inputText) {
@@ -65,14 +67,27 @@
         return;
       }
 
-      // 区切り処理: "..." は改行せず、それ以外の ".", "!", "?" で改行
       const sentences = inputText
         .split(/(?<!\.\.)(?<=\.|!|\?)(?!\.)/) // ピリオドが2つ以上続く場合は改行しない
         .map(sentence => sentence.trim())    // 各文をトリム
         .filter(sentence => sentence.length > 0); // 空の文を削除
 
-      // 結果を改行して表示
       document.getElementById("outputText").innerText = sentences.join("\n");
+    });
+
+    // 長押しでコピー機能
+    document.getElementById("outputText").addEventListener("click", function () {
+      const outputText = this.innerText;
+      if (outputText.trim() === "" || outputText === "ここに結果が表示されます") {
+        alert("コピーする内容がありません。");
+        return;
+      }
+
+      navigator.clipboard.writeText(outputText).then(() => {
+        alert("結果をコピーしました！");
+      }).catch(err => {
+        alert("コピーに失敗しました：" + err);
+      });
     });
   </script>
 </body>
