@@ -57,16 +57,6 @@
     button:active {
       background-color: #0056b3;
     }
-    /* クリアボタンだけのカスタム（長方形・「クリア✖」） */
-    #clearButton {
-      width: auto; /* 必要なサイズに自動調整 */
-      padding: 6px 12px; /* コンパクトに */
-      font-size: 14px;   /* やや小さめ */
-      background-color: #dc3545;
-      border-radius: 5px;
-      margin-bottom: 5px; /* テキストエリアと少し隙間 */
-      display: inline-block; /* インラインブロックにして右寄せに使う */
-    }
     /* コピーボタンの下に余白を追加 */
     #copyButton {
       background-color: #28a745;
@@ -76,10 +66,26 @@
     #copyButton:active {
       background-color: #1e7e34;
     }
-    /* クリアボタンを右寄せするためのラッパ */
+    /* 消去ボタンを右寄せするためのラッパ */
     .clear-container {
       display: flex;
       justify-content: flex-end; /* 右寄せ */
+    }
+    /* 消去ボタンのデザイン調整 */
+    #clearButton {
+      width: auto;
+      padding: 6px 12px;
+      font-size: 14px;
+      background-color: #dc3545;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-bottom: 5px; 
+      display: inline-block;
+    }
+    #clearButton:active {
+      background-color: #b02a37;
     }
   </style>
 </head>
@@ -93,13 +99,12 @@
     <li>変換後のテキストは「コピー」ボタンで簡単にコピーできます。</li>
   </ol>
 
-  <!-- クリアボタンを上に配置 -->
+  <!-- 消去ボタンを上に配置 -->
   <div class="clear-container">
-    <button id="clearButton">クリア✖</button>
+    <button id="clearButton">消去</button>
   </div>
 
   <textarea id="inputText" placeholder="ここに英文を入力"></textarea>
-
   <button id="convertButton">変換する</button>
 
   <h2>変換結果</h2>
@@ -154,7 +159,7 @@
       }, 2000);
     });
 
-    // クリアボタン
+    // 消去ボタン
     document.getElementById("clearButton").addEventListener("click", function () {
       document.getElementById("inputText").value = "";
       document.getElementById("outputText").innerText = "ここに結果が表示されます";
