@@ -47,7 +47,7 @@
       border: 1px solid #ccc;
       border-radius: 5px;
     }
-    /* ボタンのスタイル */
+    /* 変換・コピーなど一般ボタンのスタイル */
     button {
       display: block;
       width: 100%;
@@ -68,30 +68,62 @@
     #copyButton {
       background-color: #28a745;
       margin-top: 10px;
-      margin-bottom: 40px;
+      margin-bottom: 40px; /* 余白 */
     }
     #copyButton:active {
       background-color: #1e7e34;
     }
-    /* 消去ボタン（右寄せ用のコンテナ） */
-    .clear-container {
-      display: flex;
-      justify-content: flex-end;
-    }
-    /* 消去ボタンを明るめの灰色へ */
-    #clearButton {
+    /* カンマ改行ボタンを小さめに */
+    #toggleCommaButton {
       width: auto;
       padding: 6px 12px;
       font-size: 14px;
-      background-color: #ccc;  /* 明るめの灰色 */
-      color: #333;             /* 文字色は濃いグレー */
+      margin-bottom: 10px; /* ペーストボタンとの間隔 */
+      color: #fff;
+      background-color: #007BFF;
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      text-align: center;
+      display: inline-block;
+    }
+    #toggleCommaButton:active {
+      background-color: #0056b3;
+    }
+    /* ペースト&消去ボタンのコンテナ */
+    .paste-clear-row {
+      display: flex; 
+      justify-content: space-between; /* 左にペースト、右に消去 */
+      align-items: center;
       margin-bottom: 5px;
     }
+    /* ペーストボタン（淡い青色） */
+    #pasteButton {
+      width: auto;
+      padding: 8px 16px;
+      font-size: 14px;
+      background-color: #add8e6; /* 水色系 */
+      color: #333;              /* 濃いめ文字色 */
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #pasteButton:active {
+      background-color: #9ac0d0; /* 押下時に少し暗く */
+    }
+    /* 消去ボタン（灰色） */
+    #clearButton {
+      width: auto;
+      padding: 8px 16px;
+      font-size: 14px;
+      background-color: #ccc;
+      color: #333;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
     #clearButton:active {
-      background-color: #bbb;  /* 押下時にやや暗く */
+      background-color: #bbb;
     }
   </style>
 </head>
@@ -100,57 +132,70 @@
   <p>このアプリでは、英文を簡単に短文に分けて表示できます。</p>
   <h2>使い方</h2>
   <ol>
-    <li>下のテキストボックスに英文を入力します。</li>
+    <li>下のテキストボックスに英文を入力します。または「ペースト」ボタンでクリップボードから貼り付けます。</li>
     <li>「変換する」ボタンを押すと、文末記号で短文に分割されます。</li>
     <li>「カンマ改行：OFF」ボタンを押すと ON/OFF が切り替わり、ON の時は「,」でも改行します。</li>
     <li>変換後のテキストは「コピー」ボタンで簡単にコピーできます。</li>
   </ol>
 
-  <!-- 消去ボタンを上に配置 -->
-  <div class="clear-container">
+  <!-- カンマ改行ボタンを上部・小さめに配置 -->
+  <button id="toggleCommaButton">カンマ改行：OFF</button>
+
+  <!-- ペースト＆消去ボタンを同じ行に配置（ペースト：左寄せ、消去：右寄せ） -->
+  <div class="paste-clear-row">
+    <button id="pasteButton">ペースト</button>
     <button id="clearButton">消去</button>
   </div>
 
+  <!-- 入力テキストエリア -->
   <textarea id="inputText" placeholder="ここに英文を入力"></textarea>
 
-  <!-- 切り替えボタン（カンマ改行ON/OFF） -->
-  <button id="toggleCommaButton">カンマ改行：OFF</button>
-
+  <!-- 変換と結果表示 -->
   <button id="convertButton">変換する</button>
-
   <h2>変換結果</h2>
   <div id="outputText">ここに結果が表示されます</div>
   <button id="copyButton" style="display: none;">コピー</button>
 
   <script>
-    // カンマ改行を使うかどうかを管理するフラグ（初期はOFF）
+    // カンマ改行を使うかどうかのフラグ（初期はOFF）
     let commaSplit = false;
 
-    // 切り替えボタン
+    // カンマ改行トグルボタン
     const toggleCommaButton = document.getElementById("toggleCommaButton");
     toggleCommaButton.addEventListener("click", function() {
       commaSplit = !commaSplit;
-      if (commaSplit) {
-        toggleCommaButton.innerText = "カンマ改行：ON";
-      } else {
-        toggleCommaButton.innerText = "カンマ改行：OFF";
+      toggleCommaButton.innerText = commaSplit
+        ? "カンマ改行：ON"
+        : "カンマ改行：OFF";
+    });
+
+    // ペースト機能 (クリップボード → inputText)
+    document.getElementById("pasteButton").addEventListener("click", async function() {
+      try {
+        // クリップボードからテキストを取得
+        const text = await navigator.clipboard.readText();
+        // 既存の入力欄の末尾に追記
+        document.getElementById("inputText").value += text;
+      } catch (err) {
+        alert("クリップボードから読み取れませんでした。ブラウザの設定やHTTPS接続をご確認ください。");
+        console.error(err);
       }
     });
 
-    // テキスト変換
+    // 変換ボタン
     document.getElementById("convertButton").addEventListener("click", function () {
       const inputText = document.getElementById("inputText").value;
       const outputTextElement = document.getElementById("outputText");
       const copyButton = document.getElementById("copyButton");
 
       if (!inputText) {
-        outputTextElement.innerText = "入力が空です。英文を入力してください。";
+        outputTextElement.innerText = "入力が空です。英文を入力、またはペーストしてください。";
         copyButton.style.display = "none"; // コピー機能を非表示
         return;
       }
 
       // カンマ改行ONの場合、,(カンマ) も改行トリガーに含める
-      // ピリオドが2つ以上続く場合は改行しない正規表現は変わらず使用
+      // ピリオドが2つ以上続く場合は改行しない正規表現
       let regex;
       if (commaSplit) {
         // . ! ? , で改行
