@@ -46,24 +46,42 @@
       white-space: pre-wrap;
       font-size: 16px;
       min-height: 100px;
-      cursor: pointer;
+    }
+    #copyButton {
+      background-color: #28a745;
+      margin-top: 10px;
+    }
+    #copyButton:active {
+      background-color: #1e7e34;
     }
   </style>
 </head>
 <body>
   <h1>英文短文変換アプリ</h1>
-  <p>英文を入力して「変換する」ボタンを押してください。</p>
+  <p>このアプリでは、英文を簡単に短文に分けて表示できます。</p>
+  <h2>使い方</h2>
+  <ol>
+    <li>上のテキストボックスに英文を入力します。</li>
+    <li>「変換する」ボタンを押すと、文末記号（., !, ?）で区切られた短文に分けられます。</li>
+    <li>変換後のテキストは「コピー」ボタンで簡単にコピーできます。</li>
+  </ol>
+
   <textarea id="inputText" placeholder="ここに英文を入力"></textarea>
   <button id="convertButton">変換する</button>
   <h2>変換結果</h2>
   <div id="outputText">ここに結果が表示されます</div>
+  <button id="copyButton" style="display: none;">コピー</button>
 
   <script>
     // テキスト変換機能
     document.getElementById("convertButton").addEventListener("click", function () {
       const inputText = document.getElementById("inputText").value;
+      const outputTextElement = document.getElementById("outputText");
+      const copyButton = document.getElementById("copyButton");
+
       if (!inputText) {
-        document.getElementById("outputText").innerText = "入力が空です。英文を入力してください。";
+        outputTextElement.innerText = "入力が空です。英文を入力してください。";
+        copyButton.style.display = "none"; // コピー機能を非表示に
         return;
       }
 
@@ -72,15 +90,18 @@
         .map(sentence => sentence.trim())    // 各文をトリム
         .filter(sentence => sentence.length > 0); // 空の文を削除
 
-      document.getElementById("outputText").innerText = sentences.join("\n");
+      outputTextElement.innerText = sentences.join("\n");
+      copyButton.style.display = "block"; // コピー機能を表示
+      copyButton.innerText = "コピー"; // 初期状態に戻す
     });
 
-    // 長押しでコピー機能（iPhone対応）
-    document.getElementById("outputText").addEventListener("click", function () {
-      const outputText = this.innerText;
-      if (outputText.trim() === "" || outputText === "ここに結果が表示されます") {
-        alert("コピーする内容がありません。");
-        return;
+    // コピー機能
+    document.getElementById("copyButton").addEventListener("click", function () {
+      const outputText = document.getElementById("outputText").innerText;
+      const copyButton = this;
+
+      if (!outputText.trim() || outputText === "ここに結果が表示されます") {
+        return; // コピー対象がない場合は何もしない
       }
 
       // 一時的なテキストエリアを作成してコピー
@@ -88,13 +109,14 @@
       tempTextArea.value = outputText;
       document.body.appendChild(tempTextArea);
       tempTextArea.select();
-      try {
-        document.execCommand("copy");
-        alert("結果をコピーしました！");
-      } catch (err) {
-        alert("コピーに失敗しました：" + err);
-      }
-      document.body.removeChild(tempTextArea); // 一時テキストエリアを削除
+      document.execCommand("copy");
+      document.body.removeChild(tempTextArea);
+
+      // ボタンの文言を一時的に変更
+      copyButton.innerText = "コピー完了！";
+      setTimeout(() => {
+        copyButton.innerText = "コピー";
+      }, 2000); // 2秒後に元に戻す
     });
   </script>
 </body>
