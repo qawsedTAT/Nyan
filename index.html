@@ -22,16 +22,11 @@
       margin: 0;  /* 上下余白を調整 */
       padding: 0;
     }
-    h2 {
-      margin-top: 1.5em;
-      margin-bottom: 0.5em;
-    }
     p, ol, li {
       margin: 0.5em 0;
     }
 
-    /* ヘッダーコンテナ
-       DeepSplitタイトルとテーマスイッチを同じ行に配置 */
+    /* ヘッダーコンテナ */
     .header-container {
       display: flex;
       justify-content: space-between; /* タイトル左、スイッチ右 */
@@ -192,7 +187,7 @@
       background-color: #bbb;
     }
 
-    /* ここからダークモード (.dark-mode) */
+    /* ダークモード (.dark-mode) */
     body.dark-mode {
       background-color: #2C2C2C;
       color: #FFFFFF;
@@ -265,14 +260,6 @@
     <br>複数の文やカンマ区切りの文章もスムーズに翻訳できます。
   </p>
 
-  <h2>使い方</h2>
-  <ol>
-    <li>「ペースト」ボタンを押してクリップボードから貼り付けるか、テキストボックスに英文を入力します。</li>
-    <li>「変換する」ボタンを押すと、文末記号で短文に分割されます。</li>
-    <li>「カンマ改行：OFF」ボタンを押すとON/OFFが切り替わり、ONの時はカンマでも改行します。</li>
-    <li>変換後のテキストは「コピー」ボタンで簡単にコピーできます。</li>
-  </ol>
-
   <!-- カンマ改行ボタンを小さめに配置 -->
   <button id="toggleCommaButton">カンマ改行：OFF</button>
 
@@ -287,8 +274,10 @@
 
   <!-- 変換と結果表示 -->
   <button id="convertButton">変換する</button>
-  <h2>変換結果</h2>
-  <div id="outputText">ここに結果が表示されます</div>
+
+  <!-- 変換結果見出しを削除し、わずかな余白のみ残す -->
+  <div id="outputText" style="margin-top:15px;">ここに結果が表示されます</div>
+
   <button id="copyButton" style="display: none;">コピー</button>
 
   <script>
