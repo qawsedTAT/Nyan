@@ -19,28 +19,35 @@
       margin-top: 1.5em;
       margin-bottom: 0.5em;
     }
-    /* 入力欄と出力欄のサイズを少し縦に長く */
-    textarea, #outputText {
+    /* 入力欄 */
+    textarea {
       width: 100%;
-      min-height: 150px;  /* 縦を少し大きめに */
+      min-height: 150px;
       font-size: 16px;
       padding: 10px;
       box-sizing: border-box;
       border: 1px solid #ccc;
       border-radius: 5px;
       resize: none;
-    }
-    /* テキストエリアの背景は白 */
-    textarea {
       background-color: #fff;
+      margin-bottom: 10px;
     }
-    /* 出力欄はDIVなので背景色を変更 */
+    /* 出力欄（サイズ固定し、スクロール可能に） */
     #outputText {
       margin-top: 10px;
       background-color: #f9f9f9;
       white-space: pre-wrap;
+      width: 100%;
+      min-height: 150px;
+      max-height: 150px;     /* ← ここで高さを固定 */
+      overflow-y: auto;      /* ← はみ出したらスクロール */
+      font-size: 16px;
+      padding: 10px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 5px;
     }
-    /* ボタン全般のスタイル */
+    /* ボタンのスタイル */
     button {
       display: block;
       width: 100%;
@@ -57,21 +64,20 @@
     button:active {
       background-color: #0056b3;
     }
-    /* コピーボタンの下に余白を追加 */
+    /* 特定ボタン色 */
     #copyButton {
       background-color: #28a745;
       margin-top: 10px;
-      margin-bottom: 40px; /* 1.5～2個分程度の余白 */
+      margin-bottom: 40px;
     }
     #copyButton:active {
       background-color: #1e7e34;
     }
-    /* 消去ボタンを右寄せするためのラッパ */
+    /* 消去ボタン（右寄せ用のコンテナ） */
     .clear-container {
       display: flex;
-      justify-content: flex-end; /* 右寄せ */
+      justify-content: flex-end;
     }
-    /* 消去ボタンのデザイン調整 */
     #clearButton {
       width: auto;
       padding: 6px 12px;
@@ -81,8 +87,7 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      margin-bottom: 5px; 
-      display: inline-block;
+      margin-bottom: 5px;
     }
     #clearButton:active {
       background-color: #b02a37;
@@ -95,7 +100,8 @@
   <h2>使い方</h2>
   <ol>
     <li>下のテキストボックスに英文を入力します。</li>
-    <li>「変換する」ボタンを押すと、文末記号（., !, ?）で区切られた短文に分けられます。</li>
+    <li>「変換する」ボタンを押すと、文末記号で短文に分割されます。</li>
+    <li>「カンマ改行：OFF」ボタンを押すと ON/OFF が切り替わり、ON の時は「,」でも改行します。</li>
     <li>変換後のテキストは「コピー」ボタンで簡単にコピーできます。</li>
   </ol>
 
@@ -105,6 +111,10 @@
   </div>
 
   <textarea id="inputText" placeholder="ここに英文を入力"></textarea>
+
+  <!-- 切り替えボタン（カンマ改行ON/OFF） -->
+  <button id="toggleCommaButton">カンマ改行：OFF</button>
+
   <button id="convertButton">変換する</button>
 
   <h2>変換結果</h2>
@@ -112,6 +122,20 @@
   <button id="copyButton" style="display: none;">コピー</button>
 
   <script>
+    // カンマ改行を使うかどうかを管理するフラグ（初期はOFF）
+    let commaSplit = false;
+
+    // 切り替えボタン
+    const toggleCommaButton = document.getElementById("toggleCommaButton");
+    toggleCommaButton.addEventListener("click", function() {
+      commaSplit = !commaSplit;
+      if (commaSplit) {
+        toggleCommaButton.innerText = "カンマ改行：ON";
+      } else {
+        toggleCommaButton.innerText = "カンマ改行：OFF";
+      }
+    });
+
     // テキスト変換
     document.getElementById("convertButton").addEventListener("click", function () {
       const inputText = document.getElementById("inputText").value;
@@ -124,15 +148,25 @@
         return;
       }
 
-      // ピリオドが2つ以上続く場合は改行しない
+      // カンマ改行ONの場合、,(カンマ) も改行トリガーに含める
+      // ピリオドが2つ以上続く場合は改行しない正規表現は変わらず使用
+      let regex;
+      if (commaSplit) {
+        // . ! ? , で改行
+        regex = /(?<!\.\.)(?<=\.|!|\?|,)(?!\.)/;
+      } else {
+        // . ! ? のみで改行
+        regex = /(?<!\.\.)(?<=\.|!|\?)(?!\.)/;
+      }
+
       const sentences = inputText
-        .split(/(?<!\.\.)(?<=\.|!|\?)(?!\.)/)
+        .split(regex)
         .map(sentence => sentence.trim())
         .filter(sentence => sentence.length > 0);
 
       outputTextElement.innerText = sentences.join("\n");
-      copyButton.style.display = "block"; // コピー機能を表示
-      copyButton.innerText = "コピー"; // 初期表示に戻す
+      copyButton.style.display = "block";
+      copyButton.innerText = "コピー";
     });
 
     // コピー機能
