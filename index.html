@@ -13,7 +13,7 @@
       line-height: 1.6;
     }
     textarea {
-      width: 100%;
+      width: calc(100% - 50px);
       height: 120px;
       font-size: 16px;
       padding: 10px;
@@ -21,6 +21,22 @@
       border: 1px solid #ccc;
       border-radius: 5px;
       resize: none;
+      display: inline-block;
+    }
+    #clearButton {
+      width: 40px;
+      height: 40px;
+      font-size: 14px;
+      text-align: center;
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 40px;
+      margin-left: 5px;
     }
     button {
       display: block;
@@ -67,6 +83,7 @@
   </ol>
 
   <textarea id="inputText" placeholder="ここに英文を入力"></textarea>
+  <button id="clearButton">✖</button> <!-- 追加したクリアボタン -->
   <button id="convertButton">変換する</button>
   <h2>変換結果</h2>
   <div id="outputText">ここに結果が表示されます</div>
@@ -117,6 +134,13 @@
       setTimeout(() => {
         copyButton.innerText = "コピー";
       }, 2000); // 2秒後に元に戻す
+    });
+
+    // クリアボタンでテキストを消去
+    document.getElementById("clearButton").addEventListener("click", function () {
+      document.getElementById("inputText").value = "";
+      document.getElementById("outputText").innerText = "ここに結果が表示されます";
+      document.getElementById("copyButton").style.display = "none"; // コピー機能を非表示に
     });
   </script>
 </body>
