@@ -12,32 +12,35 @@
       margin: 10px;
       line-height: 1.6;
     }
-    textarea {
-      width: calc(100% - 50px);
-      height: 120px;
+    h1 {
+      margin-bottom: 0.5em;
+    }
+    h2 {
+      margin-top: 1.5em;
+      margin-bottom: 0.5em;
+    }
+    /* 入力欄と出力欄のサイズを合わせる */
+    textarea, #outputText {
+      width: 100%;
+      min-height: 100px;
       font-size: 16px;
       padding: 10px;
       box-sizing: border-box;
       border: 1px solid #ccc;
       border-radius: 5px;
       resize: none;
-      display: inline-block;
     }
-    #clearButton {
-      width: 40px;
-      height: 40px;
-      font-size: 14px;
-      text-align: center;
-      background-color: #dc3545;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      cursor: pointer;
-      display: inline-block;
-      vertical-align: middle;
-      line-height: 40px;
-      margin-left: 5px;
+    /* テキストエリアの背景は白で区別 */
+    textarea {
+      background-color: #fff;
     }
+    /* 出力欄はDIVなので背景色を変更 */
+    #outputText {
+      margin-top: 10px;
+      background-color: #f9f9f9;
+      white-space: pre-wrap;
+    }
+    /* ボタン全般のスタイル */
     button {
       display: block;
       width: 100%;
@@ -53,22 +56,33 @@
     button:active {
       background-color: #0056b3;
     }
-    #outputText {
-      margin-top: 10px;
-      padding: 10px;
-      background-color: #f9f9f9;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      white-space: pre-wrap;
-      font-size: 16px;
-      min-height: 100px;
-    }
+    /* コピーボタンの個別色 */
     #copyButton {
       background-color: #28a745;
       margin-top: 10px;
     }
     #copyButton:active {
       background-color: #1e7e34;
+    }
+    /* クリアボタンを小さめの円形にする場合 */
+    #clearButton {
+      width: 36px;
+      height: 36px;
+      font-size: 16px;
+      background-color: #dc3545;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      line-height: 36px;
+      text-align: center;
+      margin-bottom: 5px; /* テキストエリアとの隙間 */
+    }
+    /* クリアボタンのコンテナ */
+    .clear-container {
+      display: flex;
+      justify-content: flex-end; /* 右寄せ */
+      margin-bottom: 5px;
     }
   </style>
 </head>
@@ -77,22 +91,25 @@
   <p>このアプリでは、英文を簡単に短文に分けて表示できます。</p>
   <h2>使い方</h2>
   <ol>
-    <li>上のテキストボックスに英文を入力します。</li>
+    <li>下のテキストボックスに英文を入力します。</li>
     <li>「変換する」ボタンを押すと、文末記号（., !, ?）で区切られた短文に分けられます。</li>
     <li>変換後のテキストは「コピー」ボタンで簡単にコピーできます。</li>
   </ol>
 
-  <div style="display: flex; align-items: center;">
-    <textarea id="inputText" placeholder="ここに英文を入力"></textarea>
+  <!-- クリアボタンをテキストエリアの上に配置するコンテナ -->
+  <div class="clear-container">
     <button id="clearButton">✖</button>
   </div>
+  <textarea id="inputText" placeholder="ここに英文を入力"></textarea>
+
   <button id="convertButton">変換する</button>
+
   <h2>変換結果</h2>
   <div id="outputText">ここに結果が表示されます</div>
   <button id="copyButton" style="display: none;">コピー</button>
 
   <script>
-    // テキスト変換機能
+    // テキスト変換
     document.getElementById("convertButton").addEventListener("click", function () {
       const inputText = document.getElementById("inputText").value;
       const outputTextElement = document.getElementById("outputText");
@@ -100,18 +117,19 @@
 
       if (!inputText) {
         outputTextElement.innerText = "入力が空です。英文を入力してください。";
-        copyButton.style.display = "none"; // コピー機能を非表示に
+        copyButton.style.display = "none"; // コピー機能を非表示
         return;
       }
 
+      // ピリオドが2つ以上続く場合は改行しない
       const sentences = inputText
-        .split(/(?<!\.\.)(?<=\.|!|\?)(?!\.)/) // ピリオドが2つ以上続く場合は改行しない
-        .map(sentence => sentence.trim())    // 各文をトリム
-        .filter(sentence => sentence.length > 0); // 空の文を削除
+        .split(/(?<!\.\.)(?<=\.|!|\?)(?!\.)/)
+        .map(sentence => sentence.trim())
+        .filter(sentence => sentence.length > 0);
 
       outputTextElement.innerText = sentences.join("\n");
       copyButton.style.display = "block"; // コピー機能を表示
-      copyButton.innerText = "コピー"; // 初期状態に戻す
+      copyButton.innerText = "コピー"; // 初期表示に戻す
     });
 
     // コピー機能
@@ -123,7 +141,7 @@
         return; // コピー対象がない場合は何もしない
       }
 
-      // 一時的なテキストエリアを作成してコピー
+      // 一時的なテキストエリアでコピー
       const tempTextArea = document.createElement("textarea");
       tempTextArea.value = outputText;
       document.body.appendChild(tempTextArea);
@@ -131,18 +149,18 @@
       document.execCommand("copy");
       document.body.removeChild(tempTextArea);
 
-      // ボタンの文言を一時的に変更
+      // ボタン文言を変更（2秒後に戻す）
       copyButton.innerText = "コピー完了！";
       setTimeout(() => {
         copyButton.innerText = "コピー";
-      }, 2000); // 2秒後に元に戻す
+      }, 2000);
     });
 
-    // クリアボタンでテキストを消去
+    // クリアボタン
     document.getElementById("clearButton").addEventListener("click", function () {
       document.getElementById("inputText").value = "";
       document.getElementById("outputText").innerText = "ここに結果が表示されます";
-      document.getElementById("copyButton").style.display = "none"; // コピー機能を非表示に
+      document.getElementById("copyButton").style.display = "none";
     });
   </script>
 </body>
