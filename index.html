@@ -64,7 +64,7 @@
     button:active {
       background-color: #0056b3;
     }
-    /* 特定ボタン色 */
+    /* コピーボタン */
     #copyButton {
       background-color: #28a745;
       margin-top: 10px;
@@ -78,19 +78,20 @@
       display: flex;
       justify-content: flex-end;
     }
+    /* 消去ボタンを明るめの灰色へ */
     #clearButton {
       width: auto;
       padding: 6px 12px;
       font-size: 14px;
-      background-color: #dc3545;
-      color: #fff;
+      background-color: #ccc;  /* 明るめの灰色 */
+      color: #333;             /* 文字色は濃いグレー */
       border: none;
       border-radius: 5px;
       cursor: pointer;
       margin-bottom: 5px;
     }
     #clearButton:active {
-      background-color: #b02a37;
+      background-color: #bbb;  /* 押下時にやや暗く */
     }
   </style>
 </head>
