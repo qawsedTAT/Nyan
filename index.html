@@ -7,7 +7,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <title>DeepSplit</title>
   <style>
-    /* 全体ベーススタイル（Light時） */
+    /* -----------------------------
+       ベーススタイル（ライトモード時）
+       ----------------------------- */
     body {
       font-family: Arial, sans-serif;
       margin: 10px;
@@ -17,7 +19,8 @@
       transition: background-color 0.3s, color 0.3s;
     }
     h1 {
-      margin-bottom: 0.5em;
+      margin: 0;  /* 上下余白を調整 */
+      padding: 0;
     }
     h2 {
       margin-top: 1.5em;
@@ -27,17 +30,25 @@
       margin: 0.5em 0;
     }
 
-    /* テーマ切り替えスイッチのコンテナ */
+    /* ヘッダーコンテナ
+       DeepSplitタイトルとテーマスイッチを同じ行に配置 */
+    .header-container {
+      display: flex;
+      justify-content: space-between; /* タイトル左、スイッチ右 */
+      align-items: center;
+      margin-bottom: 10px; /* 下との余白 */
+    }
+
+    /* テーマ切り替えスイッチ部分 */
     .theme-switch {
       display: flex;
       align-items: center;
-      margin-bottom: 10px;
     }
-    .theme-switch label {
-      margin-right: 8px;
+    .theme-switch span {
+      margin-right: 8px; /* モード名とスイッチの隙間 */
     }
 
-    /* スイッチ風トグルのスタイル */
+    /* スイッチ（トグル） */
     .switch {
       position: relative;
       display: inline-block;
@@ -101,7 +112,7 @@
       border: 1px solid #ccc;
       border-radius: 5px;
     }
-    /* ボタン（Light時） */
+    /* ボタン（ライト時） */
     button {
       display: block;
       width: 100%;
@@ -133,7 +144,7 @@
       width: auto;
       padding: 6px 12px;
       font-size: 14px;
-      margin-bottom: 10px; /* ペーストボタンとの間隔 */
+      margin-bottom: 10px; 
       color: #fff;
       background-color: #007BFF;
       border: none;
@@ -181,9 +192,9 @@
       background-color: #bbb;
     }
 
-    /* ここからダークモードの設定（.dark-mode クラスが付与されたとき） */
+    /* ここからダークモード (.dark-mode) */
     body.dark-mode {
-      background-color: #2C2C2C;  /* DeepLのダークテーマ風の色 */
+      background-color: #2C2C2C;
       color: #FFFFFF;
     }
     body.dark-mode textarea {
@@ -206,13 +217,13 @@
       background-color: #2A68C8;
     }
     body.dark-mode #copyButton {
-      background-color: #19903E; /* コピー用ボタン */
+      background-color: #19903E; 
     }
     body.dark-mode #copyButton:active {
       background-color: #117C2D;
     }
     body.dark-mode #pasteButton {
-      background-color: #4AA4D1; /* 水色っぽいがやや濃く */
+      background-color: #4AA4D1; 
       color: #fff;
     }
     body.dark-mode #pasteButton:active {
@@ -225,7 +236,6 @@
     body.dark-mode #clearButton:active {
       background-color: #666;
     }
-    /* スイッチのダークモード表示切り替え */
     body.dark-mode .slider {
       background-color: #555;
     }
@@ -235,16 +245,17 @@
   </style>
 </head>
 <body>
-  <h1>DeepSplit</h1>
-
-  <!-- テーマ切り替えスイッチ (ライト/ダーク) -->
-  <div class="theme-switch">
-    <label for="themeToggle">テーマ切り替え</label>
-    <label class="switch">
-      <input type="checkbox" id="themeToggle">
-      <span class="slider round"></span>
-    </label>
-    <span id="themeLabel" style="margin-left:8px;">Light Mode</span>
+  <!-- ヘッダー行（アプリ名左、テーマトグル右） -->
+  <div class="header-container">
+    <h1>DeepSplit</h1>
+    <div class="theme-switch">
+      <!-- 現在のモード表示を左側に -->
+      <span id="themeLabel">Light Mode</span>
+      <label class="switch">
+        <input type="checkbox" id="themeToggle">
+        <span class="slider round"></span>
+      </label>
+    </div>
   </div>
 
   <!-- アプリの意図を数行で説明 -->
@@ -262,7 +273,7 @@
     <li>変換後のテキストは「コピー」ボタンで簡単にコピーできます。</li>
   </ol>
 
-  <!-- カンマ改行ボタンを上部・小さめに配置 -->
+  <!-- カンマ改行ボタンを小さめに配置 -->
   <button id="toggleCommaButton">カンマ改行：OFF</button>
 
   <!-- ペースト＆消去ボタンを同じ行に配置（左：ペースト、右：消去） -->
@@ -281,7 +292,7 @@
   <button id="copyButton" style="display: none;">コピー</button>
 
   <script>
-    // ライト / ダークテーマ切り替え
+    /* テーマトグル */
     const themeToggle = document.getElementById("themeToggle");
     const themeLabel = document.getElementById("themeLabel");
     themeToggle.addEventListener("change", function() {
@@ -294,10 +305,10 @@
       }
     });
 
-    // カンマ改行を使うかどうかのフラグ（初期はOFF）
+    /* カンマ改行を使うかどうかのフラグ（初期はOFF） */
     let commaSplit = false;
 
-    // カンマ改行トグルボタン
+    /* カンマ改行トグルボタン */
     const toggleCommaButton = document.getElementById("toggleCommaButton");
     toggleCommaButton.addEventListener("click", function() {
       commaSplit = !commaSplit;
@@ -306,7 +317,7 @@
         : "カンマ改行：OFF";
     });
 
-    // ペースト機能 (クリップボード → inputText)
+    /* ペースト機能 (クリップボード → inputText) */
     document.getElementById("pasteButton").addEventListener("click", async function() {
       try {
         const text = await navigator.clipboard.readText();
@@ -317,7 +328,7 @@
       }
     });
 
-    // 変換ボタン
+    /* 変換ボタン */
     document.getElementById("convertButton").addEventListener("click", function () {
       const inputText = document.getElementById("inputText").value;
       const outputTextElement = document.getElementById("outputText");
@@ -325,12 +336,12 @@
 
       if (!inputText) {
         outputTextElement.innerText = "入力が空です。英文を入力、またはペーストしてください。";
-        copyButton.style.display = "none"; // コピー機能を非表示
+        copyButton.style.display = "none";
         return;
       }
 
       // ピリオドが2つ以上続く場合は改行しない正規表現
-      // カンマ改行ONの場合、,(カンマ) も含めて改行
+      // カンマ改行ONの場合、カンマも含めて改行
       let regex;
       if (commaSplit) {
         // . ! ? , で改行
@@ -350,7 +361,7 @@
       copyButton.innerText = "コピー";
     });
 
-    // コピー機能
+    /* コピー機能 */
     document.getElementById("copyButton").addEventListener("click", function () {
       const outputText = document.getElementById("outputText").innerText;
       const copyButton = this;
@@ -374,7 +385,7 @@
       }, 2000);
     });
 
-    // 消去ボタン
+    /* 消去ボタン */
     document.getElementById("clearButton").addEventListener("click", function () {
       document.getElementById("inputText").value = "";
       document.getElementById("outputText").innerText = "ここに結果が表示されます";
