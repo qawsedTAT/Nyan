@@ -5,12 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <title>英文短文変換アプリ</title>
+  <title>DeepSplit</title>
   <style>
+    /* 全体ベーススタイル（Light時） */
     body {
       font-family: Arial, sans-serif;
       margin: 10px;
       line-height: 1.6;
+      background-color: #fff;
+      color: #000;
+      transition: background-color 0.3s, color 0.3s;
     }
     h1 {
       margin-bottom: 0.5em;
@@ -19,6 +23,56 @@
       margin-top: 1.5em;
       margin-bottom: 0.5em;
     }
+    p, ol, li {
+      margin: 0.5em 0;
+    }
+
+    /* テーマ切り替えスイッチのコンテナ */
+    .theme-switch {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .theme-switch label {
+      margin-right: 8px;
+    }
+
+    /* スイッチ風トグルのスタイル */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 20px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 14px; width: 14px;
+      left: 3px; bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #3A3A3A;
+    }
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+
     /* 入力欄 */
     textarea {
       width: 100%;
@@ -39,15 +93,15 @@
       white-space: pre-wrap;
       width: 100%;
       min-height: 150px;
-      max-height: 150px;     /* ← ここで高さを固定 */
-      overflow-y: auto;      /* ← はみ出したらスクロール */
+      max-height: 150px;
+      overflow-y: auto;
       font-size: 16px;
       padding: 10px;
       box-sizing: border-box;
       border: 1px solid #ccc;
       border-radius: 5px;
     }
-    /* 変換・コピーなど一般ボタンのスタイル */
+    /* ボタン（Light時） */
     button {
       display: block;
       width: 100%;
@@ -60,6 +114,7 @@
       border-radius: 5px;
       cursor: pointer;
       text-align: center;
+      transition: background-color 0.3s;
     }
     button:active {
       background-color: #0056b3;
@@ -68,7 +123,7 @@
     #copyButton {
       background-color: #28a745;
       margin-top: 10px;
-      margin-bottom: 40px; /* 余白 */
+      margin-bottom: 40px;
     }
     #copyButton:active {
       background-color: #1e7e34;
@@ -93,7 +148,7 @@
     /* ペースト&消去ボタンのコンテナ */
     .paste-clear-row {
       display: flex; 
-      justify-content: space-between; /* 左にペースト、右に消去 */
+      justify-content: space-between;
       align-items: center;
       margin-bottom: 5px;
     }
@@ -103,13 +158,13 @@
       padding: 8px 16px;
       font-size: 14px;
       background-color: #add8e6; /* 水色系 */
-      color: #333;              /* 濃いめ文字色 */
+      color: #333;
       border: none;
       border-radius: 5px;
       cursor: pointer;
     }
     #pasteButton:active {
-      background-color: #9ac0d0; /* 押下時に少し暗く */
+      background-color: #9ac0d0;
     }
     /* 消去ボタン（灰色） */
     #clearButton {
@@ -125,23 +180,92 @@
     #clearButton:active {
       background-color: #bbb;
     }
+
+    /* ここからダークモードの設定（.dark-mode クラスが付与されたとき） */
+    body.dark-mode {
+      background-color: #2C2C2C;  /* DeepLのダークテーマ風の色 */
+      color: #FFFFFF;
+    }
+    body.dark-mode textarea {
+      background-color: #3A3A3A;
+      border: 1px solid #555;
+      color: #fff;
+    }
+    body.dark-mode #outputText {
+      background-color: #3A3A3A;
+      border: 1px solid #555;
+      color: #fff;
+    }
+    body.dark-mode button {
+      background-color: #3A78D8;
+    }
+    body.dark-mode #toggleCommaButton {
+      background-color: #3A78D8;
+    }
+    body.dark-mode #toggleCommaButton:active {
+      background-color: #2A68C8;
+    }
+    body.dark-mode #copyButton {
+      background-color: #19903E; /* コピー用ボタン */
+    }
+    body.dark-mode #copyButton:active {
+      background-color: #117C2D;
+    }
+    body.dark-mode #pasteButton {
+      background-color: #4AA4D1; /* 水色っぽいがやや濃く */
+      color: #fff;
+    }
+    body.dark-mode #pasteButton:active {
+      background-color: #3B8AB3;
+    }
+    body.dark-mode #clearButton {
+      background-color: #777; 
+      color: #fff;
+    }
+    body.dark-mode #clearButton:active {
+      background-color: #666;
+    }
+    /* スイッチのダークモード表示切り替え */
+    body.dark-mode .slider {
+      background-color: #555;
+    }
+    body.dark-mode .slider:before {
+      background-color: #fff;
+    }
   </style>
 </head>
 <body>
-  <h1>英文短文変換アプリ</h1>
-  <p>このアプリでは、英文を簡単に短文に分けて表示できます。</p>
+  <h1>DeepSplit</h1>
+
+  <!-- テーマ切り替えスイッチ (ライト/ダーク) -->
+  <div class="theme-switch">
+    <label for="themeToggle">テーマ切り替え</label>
+    <label class="switch">
+      <input type="checkbox" id="themeToggle">
+      <span class="slider round"></span>
+    </label>
+    <span id="themeLabel" style="margin-left:8px;">Light Mode</span>
+  </div>
+
+  <!-- アプリの意図を数行で説明 -->
+  <p>
+    DeepSplitは文章を細かく改行し、DeepL翻訳に入力した際の
+    <br>翻訳漏れを減らすことを目的としたアプリです。
+    <br>複数の文やカンマ区切りの文章もスムーズに翻訳できます。
+  </p>
+
   <h2>使い方</h2>
   <ol>
-    <li>下のテキストボックスに英文を入力します。または「ペースト」ボタンでクリップボードから貼り付けます。</li>
+    <li>「ペースト」ボタンを押してクリップボードから貼り付けるか、テキストボックスに英文を入力します。</li>
     <li>「変換する」ボタンを押すと、文末記号で短文に分割されます。</li>
-    <li>「カンマ改行：OFF」ボタンを押すと ON/OFF が切り替わり、ON の時は「,」でも改行します。</li>
+    <li>「カンマ改行：OFF」ボタンを押すとON/OFFが切り替わり、ONの時はカンマでも改行します。</li>
     <li>変換後のテキストは「コピー」ボタンで簡単にコピーできます。</li>
   </ol>
 
   <!-- カンマ改行ボタンを上部・小さめに配置 -->
   <button id="toggleCommaButton">カンマ改行：OFF</button>
 
-  <!-- ペースト＆消去ボタンを同じ行に配置（ペースト：左寄せ、消去：右寄せ） -->
+  <!-- ペースト＆消去ボタンを同じ行に配置（左：ペースト、右：消去） -->
   <div class="paste-clear-row">
     <button id="pasteButton">ペースト</button>
     <button id="clearButton">消去</button>
@@ -157,6 +281,19 @@
   <button id="copyButton" style="display: none;">コピー</button>
 
   <script>
+    // ライト / ダークテーマ切り替え
+    const themeToggle = document.getElementById("themeToggle");
+    const themeLabel = document.getElementById("themeLabel");
+    themeToggle.addEventListener("change", function() {
+      if (this.checked) {
+        document.body.classList.add("dark-mode");
+        themeLabel.innerText = "Dark Mode";
+      } else {
+        document.body.classList.remove("dark-mode");
+        themeLabel.innerText = "Light Mode";
+      }
+    });
+
     // カンマ改行を使うかどうかのフラグ（初期はOFF）
     let commaSplit = false;
 
@@ -172,12 +309,10 @@
     // ペースト機能 (クリップボード → inputText)
     document.getElementById("pasteButton").addEventListener("click", async function() {
       try {
-        // クリップボードからテキストを取得
         const text = await navigator.clipboard.readText();
-        // 既存の入力欄の末尾に追記
         document.getElementById("inputText").value += text;
       } catch (err) {
-        alert("クリップボードから読み取れませんでした。ブラウザの設定やHTTPS接続をご確認ください。");
+        alert("クリップボードから読み取れませんでした。\nブラウザの設定やHTTPS接続をご確認ください。");
         console.error(err);
       }
     });
@@ -194,8 +329,8 @@
         return;
       }
 
-      // カンマ改行ONの場合、,(カンマ) も改行トリガーに含める
       // ピリオドが2つ以上続く場合は改行しない正規表現
+      // カンマ改行ONの場合、,(カンマ) も含めて改行
       let regex;
       if (commaSplit) {
         // . ! ? , で改行
