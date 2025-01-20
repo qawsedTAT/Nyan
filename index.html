@@ -2,10 +2,10 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <link rel="apple-touch-icon" href="icon.PNG" />
+  <link rel="apple-touch-icon" href="icon.png">
   <title>DeepSplit</title>
   <style>
     /* -----------------------------
@@ -22,9 +22,6 @@
     h1 {
       margin: 0;  /* 上下余白を調整 */
       padding: 0;
-    }
-    p, ol, li {
-      margin: 0.5em 0;
     }
 
     /* ヘッダーコンテナ */
@@ -241,11 +238,10 @@
   </style>
 </head>
 <body>
-  <!-- ヘッダー行（アプリ名左、テーマトグル右） -->
+  <!-- ヘッダー部分 -->
   <div class="header-container">
     <h1>DeepSplit</h1>
     <div class="theme-switch">
-      <!-- 現在のモード表示を左側に -->
       <span id="themeLabel">Light Mode</span>
       <label class="switch">
         <input type="checkbox" id="themeToggle">
@@ -254,17 +250,10 @@
     </div>
   </div>
 
-  <!-- アプリの意図を数行で説明 -->
-  <p>
-    DeepSplitは文章を細かく改行し、DeepL翻訳に入力した際の
-    <br>翻訳漏れを減らすことを目的としたアプリです。
-    <br>複数の文やカンマ区切りの文章もスムーズに翻訳できます。
-  </p>
-
-  <!-- カンマ改行ボタンを小さめに配置 -->
+  <!-- カンマ改行ボタン -->
   <button id="toggleCommaButton">カンマ改行：OFF</button>
 
-  <!-- ペースト＆消去ボタンを同じ行に配置（左：ペースト、右：消去） -->
+  <!-- ペースト＆消去ボタン -->
   <div class="paste-clear-row">
     <button id="pasteButton">ペースト</button>
     <button id="clearButton">消去</button>
@@ -273,12 +262,13 @@
   <!-- 入力テキストエリア -->
   <textarea id="inputText" placeholder="ここに英文を入力"></textarea>
 
-  <!-- 変換と結果表示 -->
+  <!-- 変換ボタン -->
   <button id="convertButton">変換する</button>
 
-  <!-- 変換結果見出しを削除し、わずかな余白のみ残す -->
+  <!-- 変換結果エリア -->
   <div id="outputText" style="margin-top:15px;">ここに結果が表示されます</div>
 
+  <!-- コピー機能ボタン -->
   <button id="copyButton" style="display: none;">コピー</button>
 
   <script>
